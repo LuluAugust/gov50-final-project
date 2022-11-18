@@ -27,9 +27,45 @@ emissions_mod <- emissions |>
   select(-code) |>
   filter(country == "United States")
 emissions_mod
+
+emissions_mod_graph <- emissions_mod |>
+  ggplot(mapping = aes(x = year,
+                       y = co2)) +
+  geom_point()
+emissions_mod_graph
+##go for 1970s
 ```
 
 ```{r}
-unique(emissions$Entity)
+# media <- read_csv("usa_dataset.csv")
+media_mod <- as.matrix(read_csv("usa_dataset_mod.csv", col_names = FALSE))
+media_mod[1,]<- c("year", rep(2000:2022, each = 12))
+media_mod[2,1] <- "month"
+media_mod <- as_tibble(media_mod)
+##Sooahn wrote the above code
+
+media_mod <- t(as.matrix(media_mod))
+col_names <- media_mod[1,]
+media_mod <- media_mod[-1,]
+media_mod <- as_tibble(media_mod)
+colnames(media_mod) <- col_names
+
+media_mod_1 <- media_mod |>
+  rename(total_articles = "5 newspapers combined") |>
+  select(year, total_articles) |>
+  group_by(year) |>
+  summarize(sum_articles = sum(total_articles))
+media_mod_1
+```
+```{r}
+media_mod |>
+  filter(-c("month":"Los Angeles Times"))
+  pivot_longer(
+    cols = X2:X277,
+    names_to = "year",
+    values_to = "articles",
+  )
+
+#remove rows month through Los Angeles Times, pivot_longer, group_by year, summarize sum
 ```
 
