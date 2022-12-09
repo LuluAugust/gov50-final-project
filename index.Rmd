@@ -65,16 +65,49 @@ library(foreign)
 lgbt <- read.spss("pew2013lgbtpublicdatarelease.sav", to.data.frame=TRUE)
 
 lgbt_data <- lgbt |>
-  select(NEWCASEID, OFTVOTE, Q53, PARTY, SEX, Q71, EMPLOY2, PPEDUCAT, PPETHM) |>
+  select(NEWCASEID, OFTVOTE, Q53, SEX, Q71, EMPLOY2, PPEDUCAT) |>
   rename(id = NEWCASEID,
          oft_vote = OFTVOTE,
          national_acceptance = Q53,
-         party = PARTY,
          sex = SEX,
          local_acceptance = Q71,
          job_status = EMPLOY2,
-         ed_status = PPEDUCAT,
-         race = PPETHM)
+         ed_status = PPEDUCAT) |>
+  mutate(national_acceptance_mod = case_when(
+    national_acceptance == "None at all" ~ 0,
+    national_acceptance == "Only a little" ~ 1,
+    national_acceptance == "Some" ~ 2,
+    national_acceptance == "A lot" ~ 3
+  )) |>
+  mutate(oft_vote_mod = case_when(
+    oft_vote == "Seldom" ~ 0,
+    oft_vote == "Part of the time" ~ 1,
+    oft_vote == "Nearly always" ~ 2,
+    oft_vote == "Always" ~ 3
+  )) |>
+  mutate(sex_mod = if_else(sex == "Female", 1, 0)
+  ) |>
+  mutate(ed_status_mod = if_else(ed_status == "Bachelor's degree or higher", 1, 0)
+    ) |>
+  mutate(local_acceptance_mod = case_when(
+    local_acceptance == "None at all" ~ 0,
+    local_acceptance == "Only a little" ~ 1,
+    local_acceptance == "Some" ~ 2,
+    local_acceptance == "A lot" ~ 3
+  )) |>
+  mutate(job_status_mod = if_else(job_status == "Employed full-time", 1, 0)
+  ) |>
+  select(id, national_acceptance_mod, oft_vote_mod, sex_mod, ed_status_mod, local_acceptance_mod) |>
+  drop_na()
 lgbt_data
+
+##barplot of voting (dependent variable)
+
+ggplot(data = lgbt_data, mapping = aes(x = factor(national_acceptance_mod),
+                                       y = oft_vote_mod)) +
+  geom_boxplot() +
+  labs(
+    x = "Feelings of National Acceptance of LGBT Identity"
+  )
 ```
 
