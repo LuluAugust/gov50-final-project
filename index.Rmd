@@ -61,7 +61,10 @@ lgbt_data <- lgbt |>
   select(id, national_acceptance_mod, oft_vote_mod, sex_mod, ed_status_mod, local_acceptance_mod) |>
   drop_na()
 head(lgbt_data)
+```
 
+
+```{r data wrangling, echo = FALSE}
 lgbt_data |>
   filter(oft_vote_mod == 0)
 
