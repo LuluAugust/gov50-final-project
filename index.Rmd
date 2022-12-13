@@ -1,13 +1,11 @@
 ---
-title: "Gov 50 Final Project"
-author: "Lulu August"
-description: "My final project"
+title: "National Acceptance of LGBT Identities & Voting Likelihood"
+author: "Lulu August (she/her)"
+description: "Gov50 Final Project, December 2022"
 output:
   distill::distill_article:
     self_contained: false
 ---
-
-
 
 # Introduction
 
