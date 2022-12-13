@@ -17,6 +17,7 @@ library(tidyverse)
 library(broom)
 ```
 
+# Data Wrangling
 ```{r data wrangling}
 lgbt <- read.spss("pew2013lgbtpublicdatarelease.sav", to.data.frame=TRUE)
 
@@ -55,7 +56,7 @@ lgbt_data <- lgbt |>
   ) |>
   select(id, national_acceptance_mod, oft_vote_mod, sex_mod, ed_status_mod, local_acceptance_mod) |>
   drop_na()
-lgbt_data
+head(lgbt_data)
 ```
 
 

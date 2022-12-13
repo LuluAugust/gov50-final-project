@@ -115,7 +115,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["index_files/anchor-4.2.2/anchor.min.js","index_files/bowser-1.9.3/bowser.min.js","index_files/distill-2.2.21/template.v2.js","index_files/header-attrs-2.16/header-attrs.js","index_files/header-attrs-2.17/header-attrs.js","index_files/jquery-3.6.0/jquery-3.6.0.js","index_files/jquery-3.6.0/jquery-3.6.0.min.js","index_files/jquery-3.6.0/jquery-3.6.0.min.map","index_files/popper-2.6.0/popper.min.js","index_files/tippy-6.2.7/tippy-bundle.umd.min.js","index_files/tippy-6.2.7/tippy-light-border.css","index_files/tippy-6.2.7/tippy.css","index_files/tippy-6.2.7/tippy.umd.min.js","index_files/webcomponents-2.0.0/webcomponents.js"]}
+  {"type":"character","attributes":{},"value":["annual-co2-emissions-per-country.csv","index_files/anchor-4.2.2/anchor.min.js","index_files/bowser-1.9.3/bowser.min.js","index_files/distill-2.2.21/template.v2.js","index_files/figure-html5/barplot of dependent variable-1.png","index_files/figure-html5/boxplot of independent and dependent variable-1.png","index_files/header-attrs-2.16/header-attrs.js","index_files/header-attrs-2.17/header-attrs.js","index_files/jquery-3.6.0/jquery-3.6.0.js","index_files/jquery-3.6.0/jquery-3.6.0.min.js","index_files/jquery-3.6.0/jquery-3.6.0.min.map","index_files/popper-2.6.0/popper.min.js","index_files/tippy-6.2.7/tippy-bundle.umd.min.js","index_files/tippy-6.2.7/tippy-light-border.css","index_files/tippy-6.2.7/tippy.css","index_files/tippy-6.2.7/tippy.umd.min.js","index_files/webcomponents-2.0.0/webcomponents.js","Pew2013LGBTcodebook.docx","pew2013lgbtpublicdatarelease.sav","project.csv","usa_dataset.csv","usa_dataset_mod.csv"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -1517,10 +1517,183 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 
 <div class="d-article">
-<h2 id="project-thoughts">Project thoughts</h2>
-<p>I am interested in exploring whether electric vehicle subsidies are actually effective, and how that compares to the effectiveness of carbon taxes and more negative measures in getting people to shift towards EV use. I’m also interested in seeing how whether the political party of the federal or state government is a predictor of environmental government action on the local level.</p>
-<p>Proposal: Did the Inflation Reduction Act and economic rhetoric surrounding climate policy (a more economic focus - e.g. “jobs”, “inflation reduction”) correlate with more conservative voter support for Biden’s climate policy? I would like to study the theory that climate policy can become more palatable when the framing of it is changed. I think that it likely will not have much of an effect on conservative voters because of the polarized nature of today’s political environment and also because framing doesn’t really address the issue with climate solutions (which is often directly impacting those who work in gas/coal/many other industries). I would try to join two data samples, one from when Biden had just entered office, and one to after the Inflation Reduction Act was passed, for example, a Pew Research Survey of 10,282 people conducted from May 2-8, 2022. Each unit would be a person. I would filter out the data to conservative voters, and the explanatory variable would be the time the survey was done: before or after the Inflation Reduction Act was passed. My outcome variable is how the conservative voters rate their approval of Biden’s climate policy in percentage points. If the average rate of approval of Biden’s policy increases, it would show that there may have been a positive impact of Biden’s framing and policies in gaining conservative approval, whereas if the approval rating of Biden’s climate policies decreases, it may indicate a correlation with the opposite.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<h2 id="introduction">Introduction</h2>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://svn.r-project.org/R-packages/trunk/foreign/'>foreign</a></span><span class='op'>)</span></span>
+<span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span></span>
+<span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://broom.tidymodels.org/'>broom</a></span><span class='op'>)</span></span></code></pre>
+</div>
+</div>
+#Data Wrangling
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>lgbt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/foreign/man/read.spss.html'>read.spss</a></span><span class='op'>(</span><span class='st'>"pew2013lgbtpublicdatarelease.sav"</span>, to.data.frame<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='va'>lgbt_data</span> <span class='op'>&lt;-</span> <span class='va'>lgbt</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>NEWCASEID</span>, <span class='va'>OFTVOTE</span>, <span class='va'>Q53</span>, <span class='va'>SEX</span>, <span class='va'>Q71</span>, <span class='va'>EMPLOY2</span>, <span class='va'>PPEDUCAT</span><span class='op'>)</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/rename.html'>rename</a></span><span class='op'>(</span>id <span class='op'>=</span> <span class='va'>NEWCASEID</span>,</span>
+<span>         oft_vote <span class='op'>=</span> <span class='va'>OFTVOTE</span>,</span>
+<span>         national_acceptance <span class='op'>=</span> <span class='va'>Q53</span>,</span>
+<span>         sex <span class='op'>=</span> <span class='va'>SEX</span>,</span>
+<span>         local_acceptance <span class='op'>=</span> <span class='va'>Q71</span>,</span>
+<span>         job_status <span class='op'>=</span> <span class='va'>EMPLOY2</span>,</span>
+<span>         ed_status <span class='op'>=</span> <span class='va'>PPEDUCAT</span><span class='op'>)</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>national_acceptance_mod <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/case_when.html'>case_when</a></span><span class='op'>(</span></span>
+<span>    <span class='va'>national_acceptance</span> <span class='op'>==</span> <span class='st'>"None at all"</span> <span class='op'>~</span> <span class='fl'>0</span>,</span>
+<span>    <span class='va'>national_acceptance</span> <span class='op'>==</span> <span class='st'>"Only a little"</span> <span class='op'>~</span> <span class='fl'>1</span>,</span>
+<span>    <span class='va'>national_acceptance</span> <span class='op'>==</span> <span class='st'>"Some"</span> <span class='op'>~</span> <span class='fl'>2</span>,</span>
+<span>    <span class='va'>national_acceptance</span> <span class='op'>==</span> <span class='st'>"A lot"</span> <span class='op'>~</span> <span class='fl'>3</span></span>
+<span>  <span class='op'>)</span><span class='op'>)</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>oft_vote_mod <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/case_when.html'>case_when</a></span><span class='op'>(</span></span>
+<span>    <span class='va'>oft_vote</span> <span class='op'>==</span> <span class='st'>"Seldom"</span> <span class='op'>~</span> <span class='fl'>0</span>,</span>
+<span>    <span class='va'>oft_vote</span> <span class='op'>==</span> <span class='st'>"Part of the time"</span> <span class='op'>~</span> <span class='fl'>1</span>,</span>
+<span>    <span class='va'>oft_vote</span> <span class='op'>==</span> <span class='st'>"Nearly always"</span> <span class='op'>~</span> <span class='fl'>2</span>,</span>
+<span>    <span class='va'>oft_vote</span> <span class='op'>==</span> <span class='st'>"Always"</span> <span class='op'>~</span> <span class='fl'>3</span></span>
+<span>  <span class='op'>)</span><span class='op'>)</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>sex_mod <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/if_else.html'>if_else</a></span><span class='op'>(</span><span class='va'>sex</span> <span class='op'>==</span> <span class='st'>"Female"</span>, <span class='fl'>1</span>, <span class='fl'>0</span><span class='op'>)</span></span>
+<span>  <span class='op'>)</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>ed_status_mod <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/if_else.html'>if_else</a></span><span class='op'>(</span><span class='va'>ed_status</span> <span class='op'>==</span> <span class='st'>"Bachelor's degree or higher"</span>, <span class='fl'>1</span>, <span class='fl'>0</span><span class='op'>)</span></span>
+<span>    <span class='op'>)</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>local_acceptance_mod <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/case_when.html'>case_when</a></span><span class='op'>(</span></span>
+<span>    <span class='va'>local_acceptance</span> <span class='op'>==</span> <span class='st'>"None at all"</span> <span class='op'>~</span> <span class='fl'>0</span>,</span>
+<span>    <span class='va'>local_acceptance</span> <span class='op'>==</span> <span class='st'>"Only a little"</span> <span class='op'>~</span> <span class='fl'>1</span>,</span>
+<span>    <span class='va'>local_acceptance</span> <span class='op'>==</span> <span class='st'>"Some"</span> <span class='op'>~</span> <span class='fl'>2</span>,</span>
+<span>    <span class='va'>local_acceptance</span> <span class='op'>==</span> <span class='st'>"A lot"</span> <span class='op'>~</span> <span class='fl'>3</span></span>
+<span>  <span class='op'>)</span><span class='op'>)</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>job_status_mod <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/if_else.html'>if_else</a></span><span class='op'>(</span><span class='va'>job_status</span> <span class='op'>==</span> <span class='st'>"Employed full-time"</span>, <span class='fl'>1</span>, <span class='fl'>0</span><span class='op'>)</span></span>
+<span>  <span class='op'>)</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>id</span>, <span class='va'>national_acceptance_mod</span>, <span class='va'>oft_vote_mod</span>, <span class='va'>sex_mod</span>, <span class='va'>ed_status_mod</span>, <span class='va'>local_acceptance_mod</span><span class='op'>)</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://tidyr.tidyverse.org/reference/drop_na.html'>drop_na</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>lgbt_data</span><span class='op'>)</span></span></code></pre>
+</div>
+<pre><code>  id national_acceptance_mod oft_vote_mod sex_mod ed_status_mod
+1  2                       2            3       0             1
+2  3                       2            3       1             1
+3  4                       2            3       1             1
+4  5                       2            3       0             1
+5  6                       1            2       1             1
+6  7                       1            0       1             1
+  local_acceptance_mod
+1                    3
+2                    3
+3                    1
+4                    2
+5                    2
+6                    2</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>lgbt_data</span>, mapping <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>national_acceptance_mod</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_bar.html'>geom_bar</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span> <span class='op'>(</span>x <span class='op'>=</span> <span class='st'>"Feelings of National Acceptance of LGBT Americans"</span>,</span>
+<span>        y <span class='op'>=</span> <span class='st'>"Number of People"</span>,</span>
+<span>        title <span class='op'>=</span> <span class='st'>"How People Feel About National Acceptance of LGBT Americans"</span><span class='op'>)</span></span></code></pre>
+</div>
+<p><img src="index_files/figure-html5/barplot%20of%20dependent%20variable-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>lgbt_data</span>, mapping <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>national_acceptance_mod</span><span class='op'>)</span>,</span>
+<span>                                       y <span class='op'>=</span> <span class='va'>oft_vote_mod</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_boxplot.html'>geom_boxplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span></span>
+<span>    x <span class='op'>=</span> <span class='st'>"Feelings of National Acceptance of LGBT Identity"</span><span class='op'>)</span></span></code></pre>
+</div>
+<p><img src="index_files/figure-html5/boxplot%20of%20independent%20and%20dependent%20variable-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>regression</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>oft_vote_mod</span> <span class='op'>~</span> <span class='va'>national_acceptance_mod</span>, data <span class='op'>=</span> <span class='va'>lgbt_data</span><span class='op'>)</span></span>
+<span><span class='fu'><a href='https://generics.r-lib.org/reference/tidy.html'>tidy</a></span><span class='op'>(</span><span class='va'>regression</span><span class='op'>)</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span>digits <span class='op'>=</span> <span class='fl'>3</span>, caption <span class='op'>=</span> <span class='st'>"Multiple Variable Regression of Different Factors and Voting Likelihood"</span><span class='op'>)</span></span></code></pre>
+</div>
+<table>
+<caption>(#tab:one variable linear regression)Multiple Variable Regression of Different Factors and Voting Likelihood</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">1.757</td>
+<td style="text-align: right;">0.097</td>
+<td style="text-align: right;">18.063</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">national_acceptance_mod</td>
+<td style="text-align: right;">0.274</td>
+<td style="text-align: right;">0.047</td>
+<td style="text-align: right;">5.888</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>multi_regression</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>oft_vote_mod</span> <span class='op'>~</span> <span class='va'>national_acceptance_mod</span> <span class='op'>+</span> <span class='va'>sex_mod</span> <span class='op'>+</span> <span class='va'>ed_status_mod</span> <span class='op'>+</span> <span class='va'>local_acceptance_mod</span>, data <span class='op'>=</span> <span class='va'>lgbt_data</span><span class='op'>)</span></span>
+<span><span class='fu'><a href='https://generics.r-lib.org/reference/tidy.html'>tidy</a></span><span class='op'>(</span><span class='va'>multi_regression</span><span class='op'>)</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span>digits <span class='op'>=</span> <span class='fl'>3</span>, caption <span class='op'>=</span> <span class='st'>"Multiple Variable Regression of Different Factors and Voting Likelihood"</span><span class='op'>)</span></span></code></pre>
+</div>
+<table>
+<caption>(#tab:multiple variable linear regression)Multiple Variable Regression of Different Factors and Voting Likelihood</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">1.594</td>
+<td style="text-align: right;">0.108</td>
+<td style="text-align: right;">14.744</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">national_acceptance_mod</td>
+<td style="text-align: right;">0.180</td>
+<td style="text-align: right;">0.047</td>
+<td style="text-align: right;">3.878</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sex_mod</td>
+<td style="text-align: right;">-0.226</td>
+<td style="text-align: right;">0.054</td>
+<td style="text-align: right;">-4.151</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ed_status_mod</td>
+<td style="text-align: right;">0.513</td>
+<td style="text-align: right;">0.055</td>
+<td style="text-align: right;">9.321</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">local_acceptance_mod</td>
+<td style="text-align: right;">0.105</td>
+<td style="text-align: right;">0.035</td>
+<td style="text-align: right;">3.044</td>
+<td style="text-align: right;">0.002</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
