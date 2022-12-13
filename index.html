@@ -1517,7 +1517,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 
 <div class="d-article">
-<h2 id="introduction">Introduction</h2>
+<h1 id="introduction">Introduction</h1>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://svn.r-project.org/R-packages/trunk/foreign/'>foreign</a></span><span class='op'>)</span></span>
@@ -1525,7 +1525,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://broom.tidymodels.org/'>broom</a></span><span class='op'>)</span></span></code></pre>
 </div>
 </div>
-<h1 id="data-wrangling">Data Wrangling</h1>
+<h1 id="data-description">Data Description</h1>
+<h5 id="data-wrangling">Data Wrangling</h5>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>lgbt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/foreign/man/read.spss.html'>read.spss</a></span><span class='op'>(</span><span class='st'>"pew2013lgbtpublicdatarelease.sav"</span>, to.data.frame<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span></span>
@@ -1582,6 +1583,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 5                    2
 6                    2</code></pre>
 </div>
+<h5 id="barplot-of-dependent-variable">Barplot of Dependent Variable</h5>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>lgbt_data</span>, mapping <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>national_acceptance_mod</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span></span>
@@ -1592,6 +1594,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 <p><img src="index_files/figure-html5/barplot%20of%20dependent%20variable-1.png" width="624" /></p>
 </div>
+<h1 id="results">Results</h1>
+<h5 id="boxplot-of-main-relationship-of-interest">Boxplot of Main Relationship of Interest</h5>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>lgbt_data</span>, mapping <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>national_acceptance_mod</span><span class='op'>)</span>,</span>
@@ -1602,6 +1606,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 <p><img src="index_files/figure-html5/boxplot%20of%20independent%20and%20dependent%20variable-1.png" width="624" /></p>
 </div>
+<h5 id="one-variable-linear-regression">One Variable Linear Regression</h5>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>regression</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>oft_vote_mod</span> <span class='op'>~</span> <span class='va'>national_acceptance_mod</span>, data <span class='op'>=</span> <span class='va'>lgbt_data</span><span class='op'>)</span></span>
@@ -1637,6 +1642,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </tbody>
 </table>
 </div>
+<h5 id="multiple-variable-regression">Multiple Variable Regression</h5>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>multi_regression</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>oft_vote_mod</span> <span class='op'>~</span> <span class='va'>national_acceptance_mod</span> <span class='op'>+</span> <span class='va'>sex_mod</span> <span class='op'>+</span> <span class='va'>ed_status_mod</span> <span class='op'>+</span> <span class='va'>local_acceptance_mod</span>, data <span class='op'>=</span> <span class='va'>lgbt_data</span><span class='op'>)</span></span>
@@ -1693,6 +1699,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </tbody>
 </table>
 </div>
+<h1 id="conclusion">Conclusion</h1>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->

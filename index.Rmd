@@ -11,15 +11,17 @@ output:
 
 # Introduction
 
+
+# Data Description
+
+##### Data Wrangling
+
 ```{r loading packages}
 library(foreign)
 library(tidyverse)
 library(broom)
 ```
 
-# Data Description
-
-##### Data Wrangling
 ```{r data wrangling}
 lgbt <- read.spss("pew2013lgbtpublicdatarelease.sav", to.data.frame=TRUE)
 
@@ -59,15 +61,27 @@ lgbt_data <- lgbt |>
   select(id, national_acceptance_mod, oft_vote_mod, sex_mod, ed_status_mod, local_acceptance_mod) |>
   drop_na()
 head(lgbt_data)
+
+lgbt_data |>
+  filter(oft_vote_mod == 0)
+
+lgbt_data |>
+  filter(oft_vote_mod == 1)
+
+lgbt_data |>
+  filter(oft_vote_mod == 2)
+
+lgbt_data |>
+  filter(oft_vote_mod == 3)
 ```
 
 ##### Barplot of Dependent Variable
 ```{r barplot of dependent variable}
-ggplot(data = lgbt_data, mapping = aes(x = factor(national_acceptance_mod))) +
+ggplot(data = lgbt_data, mapping = aes(x = factor(oft_vote_mod))) +
   geom_bar() +
-  labs (x = "Feelings of National Acceptance of LGBT Americans",
+  labs (x = "Number of People in Different Voting Likelihoods",
         y = "Number of People",
-        title = "How People Feel About National Acceptance of LGBT Americans")
+        title = "Voting Likelihood")
 ```
 
 # Results
