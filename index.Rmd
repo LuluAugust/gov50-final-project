@@ -22,23 +22,24 @@ library(tidyverse)
 library(broom)
 ```
 
-```{r data wrangling}
+```{r, echo=FALSE}
 lgbt <- read.spss("pew2013lgbtpublicdatarelease.sav", to.data.frame=TRUE)
+```
 
+
+```{r data wrangling}
 lgbt_data <- lgbt |>
-  select(NEWCASEID, OFTVOTE, Q53, SEX, Q71, EMPLOY2, PPEDUCAT) |>
-  rename(id = NEWCASEID,
-         oft_vote = OFTVOTE,
-         national_acceptance = Q53,
+  select(OFTVOTE, Q53, SEX, Q71, PPEDUCAT) |>
+  rename(oft_vote = OFTVOTE,
+         nat_acceptance = Q53,
          sex = SEX,
-         local_acceptance = Q71,
-         job_status = EMPLOY2,
-         ed_status = PPEDUCAT) |>
-  mutate(national_acceptance_mod = case_when(
-    national_acceptance == "None at all" ~ 0,
-    national_acceptance == "Only a little" ~ 1,
-    national_acceptance == "Some" ~ 2,
-    national_acceptance == "A lot" ~ 3
+         loc_acceptance = Q71,
+         ed = PPEDUCAT) |>
+  mutate(nat_acceptance_mod = case_when(
+    nat_acceptance == "None at all" ~ 0,
+    nat_acceptance == "Only a little" ~ 1,
+    nat_acceptance == "Some" ~ 2,
+    nat_acceptance == "A lot" ~ 3
   )) |>
   mutate(oft_vote_mod = case_when(
     oft_vote == "Seldom" ~ 0,
@@ -48,35 +49,19 @@ lgbt_data <- lgbt |>
   )) |>
   mutate(sex_mod = if_else(sex == "Female", 1, 0)
   ) |>
-  mutate(ed_status_mod = if_else(ed_status == "Bachelor's degree or higher", 1, 0)
+  mutate(ed_mod = if_else(ed == "Bachelor's degree or higher", 1, 0)
     ) |>
-  mutate(local_acceptance_mod = case_when(
-    local_acceptance == "None at all" ~ 0,
-    local_acceptance == "Only a little" ~ 1,
-    local_acceptance == "Some" ~ 2,
-    local_acceptance == "A lot" ~ 3
+  mutate(loc_acceptance_mod = case_when(
+    loc_acceptance == "None at all" ~ 0,
+    loc_acceptance == "Only a little" ~ 1,
+    loc_acceptance == "Some" ~ 2,
+    loc_acceptance == "A lot" ~ 3
   )) |>
-  mutate(job_status_mod = if_else(job_status == "Employed full-time", 1, 0)
-  ) |>
-  select(id, national_acceptance_mod, oft_vote_mod, sex_mod, ed_status_mod, local_acceptance_mod) |>
+  select(nat_acceptance_mod, oft_vote_mod, sex_mod, ed_mod, loc_acceptance_mod) |>
   drop_na()
 head(lgbt_data)
 ```
 
-
-```{r data wrangling, echo = FALSE}
-lgbt_data |>
-  filter(oft_vote_mod == 0)
-
-lgbt_data |>
-  filter(oft_vote_mod == 1)
-
-lgbt_data |>
-  filter(oft_vote_mod == 2)
-
-lgbt_data |>
-  filter(oft_vote_mod == 3)
-```
 
 ##### Barplot of Dependent Variable
 ```{r barplot of dependent variable}
@@ -86,12 +71,29 @@ ggplot(data = lgbt_data, mapping = aes(x = factor(oft_vote_mod))) +
         y = "Number of People",
         title = "Voting Likelihood")
 ```
+```{r}
+n_zero_vote <- lgbt_data |>
+  filter(oft_vote_mod == 0)
+print(nrow(n_zero_vote))
+
+n_one_vote <- lgbt_data |>
+  filter(oft_vote_mod == 1)
+print(nrow(n_one_vote))
+
+n_two_vote <- lgbt_data |>
+  filter(oft_vote_mod == 2)
+print(nrow(n_two_vote))
+
+n_three_vote <- lgbt_data |>
+  filter(oft_vote_mod == 3)
+print(nrow(n_three_vote))
+```
 
 # Results
 
 ##### Boxplot of Main Relationship of Interest
 ```{r boxplot of independent and dependent variable}
-ggplot(data = lgbt_data, mapping = aes(x = factor(national_acceptance_mod),
+ggplot(data = lgbt_data, mapping = aes(x = factor(nat_acceptance_mod),
                                        y = oft_vote_mod)) +
   geom_boxplot() +
   labs(
@@ -100,17 +102,28 @@ ggplot(data = lgbt_data, mapping = aes(x = factor(national_acceptance_mod),
 
 ##### One Variable Linear Regression
 ```{r one variable linear regression}
-regression <- lm(oft_vote_mod ~ national_acceptance_mod, data = lgbt_data)
+regression <- lm(oft_vote_mod ~ nat_acceptance_mod, data = lgbt_data)
 tidy(regression) |>
   knitr::kable(digits = 3, caption = "Multiple Variable Regression of Different Factors and Voting Likelihood")
 ```
 
 ##### Multiple Variable Regression
 ```{r multiple variable linear regression}
-multi_regression <- lm(oft_vote_mod ~ national_acceptance_mod + sex_mod + ed_status_mod + local_acceptance_mod, data = lgbt_data)
+multi_regression <- lm(oft_vote_mod ~ nat_acceptance_mod + sex_mod + ed_mod + loc_acceptance_mod, data = lgbt_data)
 tidy(multi_regression) |>
   knitr::kable(digits = 3, caption = "Multiple Variable Regression of Different Factors and Voting Likelihood")
 ```
 
 
 # Conclusion
+
+# Bibliography
+"About Pew Research Center." Pew Research Center, www.pewresearch.org/about/.
+
+Cherry, Kendra. "How Do Cross-Sectional Studies Work?" Very Well Mind, www.verywellmind.com/what-is-a-cross-sectional-study-2794978.
+
+George, Tegan. "What Is an Observational Study? | Guide & Examples." Scribbr, 31 Mar. 2022, www.scribbr.com/methodology/observational-study/.
+
+Suh, Michael. 2013 Survey of LGBT Adults. 18 Sept. 2014. Pew Research Center, www.pewresearch.org/social-trends/2014/09/18/2013-survey-of-lgbt-adults/.
+
+"Voter Turnout." FairVote, fairvote.org/resources/voter-turnout/#what-affects-voter-turnout.
