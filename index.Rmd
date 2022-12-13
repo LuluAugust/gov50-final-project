@@ -12,6 +12,7 @@ output:
 # Introduction
 
 
+
 # Data Description
 
 ##### Data Wrangling
@@ -101,17 +102,23 @@ ggplot(data = lgbt_data, mapping = aes(x = factor(nat_acceptance_mod),
 ```
 
 ##### One Variable Linear Regression
-```{r one variable linear regression}
+```{r}
 regression <- lm(oft_vote_mod ~ nat_acceptance_mod, data = lgbt_data)
-tidy(regression) |>
-  knitr::kable(digits = 3, caption = "Multiple Variable Regression of Different Factors and Voting Likelihood")
+
+modelsummary::modelsummary(regression,
+                           statistic = c("s.e. = {std.error}",
+                                         "p = {p.value}"),
+                           gof_map = c("nobs", "r.squared", "adj.r.squared"))
 ```
 
 ##### Multiple Variable Regression
-```{r multiple variable linear regression}
+```{r}
 multi_regression <- lm(oft_vote_mod ~ nat_acceptance_mod + sex_mod + ed_mod + loc_acceptance_mod, data = lgbt_data)
-tidy(multi_regression) |>
-  knitr::kable(digits = 3, caption = "Multiple Variable Regression of Different Factors and Voting Likelihood")
+
+modelsummary::modelsummary(multi_regression,
+                           statistic = c("s.e. = {std.error}",
+                                         "p = {p.value}"),
+                           gof_map = c("nobs", "r.squared", "adj.r.squared"))
 ```
 
 
