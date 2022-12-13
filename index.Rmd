@@ -9,7 +9,7 @@ output:
 
 
 
-## Introduction
+# Introduction
 
 ```{r loading packages}
 library(foreign)
@@ -17,7 +17,9 @@ library(tidyverse)
 library(broom)
 ```
 
-# Data Wrangling
+# Data Description
+
+##### Data Wrangling
 ```{r data wrangling}
 lgbt <- read.spss("pew2013lgbtpublicdatarelease.sav", to.data.frame=TRUE)
 
@@ -59,7 +61,7 @@ lgbt_data <- lgbt |>
 head(lgbt_data)
 ```
 
-
+##### Barplot of Dependent Variable
 ```{r barplot of dependent variable}
 ggplot(data = lgbt_data, mapping = aes(x = factor(national_acceptance_mod))) +
   geom_bar() +
@@ -68,7 +70,9 @@ ggplot(data = lgbt_data, mapping = aes(x = factor(national_acceptance_mod))) +
         title = "How People Feel About National Acceptance of LGBT Americans")
 ```
 
+# Results
 
+##### Boxplot of Main Relationship of Interest
 ```{r boxplot of independent and dependent variable}
 ggplot(data = lgbt_data, mapping = aes(x = factor(national_acceptance_mod),
                                        y = oft_vote_mod)) +
@@ -77,12 +81,14 @@ ggplot(data = lgbt_data, mapping = aes(x = factor(national_acceptance_mod),
     x = "Feelings of National Acceptance of LGBT Identity")
 ```
 
+##### One Variable Linear Regression
 ```{r one variable linear regression}
 regression <- lm(oft_vote_mod ~ national_acceptance_mod, data = lgbt_data)
 tidy(regression) |>
   knitr::kable(digits = 3, caption = "Multiple Variable Regression of Different Factors and Voting Likelihood")
 ```
 
+##### Multiple Variable Regression
 ```{r multiple variable linear regression}
 multi_regression <- lm(oft_vote_mod ~ national_acceptance_mod + sex_mod + ed_status_mod + local_acceptance_mod, data = lgbt_data)
 tidy(multi_regression) |>
@@ -90,4 +96,4 @@ tidy(multi_regression) |>
 ```
 
 
-
+# Conclusion
