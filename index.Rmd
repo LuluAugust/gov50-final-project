@@ -9,13 +9,14 @@ output:
 
 # Introduction
 
+Do feelings of social acceptance correlate with voting patterns amongst LGBT Americans? I hypothesize that greater feelings of LGBT social acceptance will correlate positively with greater voting likelihood amongst LGBT Americans. According to FairVote, demographics impact voting likelihood. Demographic factors that are often widely socially accepted, such as being white or earning a higher income, are associated with higher levels of voter turnout. On the other hand, being a person of color or being in poverty, both demographics that are afflicted by systemic injustices and less socially accepted, are associated with lower levels of voter turnout. Though there are many other factors beyond demographics that impact voter turnout, it is possible that greater levels of discrimination experienced by LGBT Americans is associated with lower voter turnout.
 
+My independent variable, nat_acceptance_mod, is the level of social acceptance people feel there is in the country of LGBT people. The possible values are 0 (None at all), 1 (Only a little), 2(Some), and 3 (A lot). My dependent variable is the self-reported voting likelihood of respondents. The possible values are 0 (Seldom), 1(Part of the time), 2(Nearly Always), and 3 (Always). The data would support my hypothesis if in every unit increase of feelings of national social acceptance of LGBT identities, voting likelihood increased. However, if for every unit increase of feelings of national social acceptance of LGBT identities, voting likelihood decreases, that would falsify my hypothesis. This is interesting because it demonstrates how societal acceptance, which is often driven by policy, can impact voter turnout in underrepresented demographics, which can cyclically influence policy priorities.
 
 # Data Description
 
-##### Data Wrangling
-
-```{r loading packages}
+##### Sample of Dataset
+```{r, echo = FALSE}
 library(foreign)
 library(tidyverse)
 library(broom)
@@ -26,7 +27,7 @@ lgbt <- read.spss("pew2013lgbtpublicdatarelease.sav", to.data.frame=TRUE)
 ```
 
 
-```{r data wrangling}
+```{r, echo = FALSE}
 lgbt_data <- lgbt |>
   select(OFTVOTE, Q53, SEX, Q71, PPEDUCAT) |>
   rename(oft_vote = OFTVOTE,
@@ -58,19 +59,23 @@ lgbt_data <- lgbt |>
   )) |>
   select(nat_acceptance_mod, oft_vote_mod, sex_mod, ed_mod, loc_acceptance_mod) |>
   drop_na()
-head(lgbt_data)
+knitr::kable(head(lgbt_data))
 ```
+The data comes from the Pew Research Center, a DC-based non-partisan think tank with a reputation for good data research and analysis. It was an online survey in English conducted in April 2013 of 1,197 self-identified LGBT adults (ages 18+) in the U.S. They recruited survey respondents through “random digit-dialing and address-based sampling methodologies” across those with and without internet access, and the survey asked a series of “demographic, attitudinal and behavioral questions.” Although the survey was not anonymous, people's identities were kept confidential. I dropped NA values for this analysis, so my modified dataset is of 1,176 respondents.
 
+My research design is cross-sectional, a type of observational study. This means that a particular population was observed, in this case surveyed, at a set point in time. From this type of study, I can find potential relationships, but not a causal effect.
+
+In a regression below, I will consider a few other variables beyond the independent and dependent ones. The sex variable, sex_mod, is for whether or not the respondent is a female (1 if a female, 0 if not). The education status variable, ed_mod, is for whether or not someone received a Bachelor’s degree or higher (1 if they have, 0 if they have not). The feelings of acceptance of LGBT identities in respondents’ respective cities or towns of residence , local_acceptance_mod, is on a scale of 0 to 3 (0 = None at all, 1 = Only a little, 2 = Some, and 3 = A lot).
 
 ##### Barplot of Dependent Variable
-```{r barplot of dependent variable}
+```{r, echo = FALSE}
 ggplot(data = lgbt_data, mapping = aes(x = factor(oft_vote_mod))) +
   geom_bar() +
-  labs (x = "Number of People in Different Voting Likelihoods",
-        y = "Number of People",
-        title = "Voting Likelihood")
+  labs (x = "Self-Reported Voting Likelihood of Respondents",
+        y = "Number of Respondents",
+        title = "Self-Reported Voting Likelihood")
 ```
-```{r}
+```{r, echo = FALSE}
 n_zero_vote <- lgbt_data |>
   filter(oft_vote_mod == 0)
 print(nrow(n_zero_vote))
@@ -87,20 +92,25 @@ n_three_vote <- lgbt_data |>
   filter(oft_vote_mod == 3)
 print(nrow(n_three_vote))
 ```
+The dependent variable is summarized above in a barplot. The data reveals that the fewest number of survey respondents, 78, vote part of the time, followed by 124 of survey respondents who seldom vote, followed by 289 survey respondents, who nearly always vote, followed by 685 of survey respondents, who always vote. Overall, most respondents self-report always voting or voting pretty regularly.
 
 # Results
 
 ##### Boxplot of Main Relationship of Interest
-```{r boxplot of independent and dependent variable}
+```{r, echo = FALSE}
 ggplot(data = lgbt_data, mapping = aes(x = factor(nat_acceptance_mod),
                                        y = oft_vote_mod)) +
   geom_boxplot() +
   labs(
-    x = "Feelings of National Acceptance of LGBT Identity")
+    x = "Feelings of National LGBT Acceptance",
+    y = "Voting Likelihood",
+    title = "Feelings of National Acceptance & Voting Likelihood of Respondents")
 ```
 
+The boxplot of the main relationship of interest, between feelings of national LGBT acceptance and voting likelihoods of survey respondents, is shown above. It shows that respondents who felt there was some or a lot of national acceptance of LGBT identities had a median of always voting. However, respondents who felt there was only a little or no national acceptance of LGBT identities had a lower median voting likelihood (nearly always rather than always). Spread across all groups in voting likelihood appears relatively similar across each group. Overall, people who felt greater national acceptance of LGBT identities correlated to a greater likelihood of voting.
+
 ##### One Variable Linear Regression
-```{r}
+```{r, echo = FALSE}
 regression <- lm(oft_vote_mod ~ nat_acceptance_mod, data = lgbt_data)
 
 modelsummary::modelsummary(regression,
@@ -108,9 +118,10 @@ modelsummary::modelsummary(regression,
                                          "p = {p.value}"),
                            gof_map = c("nobs", "r.squared", "adj.r.squared"))
 ```
+The intercept shows that when people feel that there is no national acceptance of LGBT identities at all, their self-reported voting likelihood is 1.757 (between voting part of the time and nearly always voting). The estimated coefficient shows that every 1-unit increase in feelings of national LGBT acceptance is associated with a voting likelihood increase by 0.274 units. Using the alpha level 0.05, the p-value of this coefficient, about 0, is less than 0.05. This means the estimated coefficient is statistically significant. Overall, one could infer that greater feelings of national acceptance of LGBT identity are associated with higher likelihoods of voting. Because there are many factors that affect voter likelihood and because the one variable regression does not control for those factors, I do not believe that there is a proven causal relationship.
 
 ##### Multiple Variable Regression
-```{r}
+```{r, echo = FALSE}
 multi_regression <- lm(oft_vote_mod ~ nat_acceptance_mod + sex_mod + ed_mod + loc_acceptance_mod, data = lgbt_data)
 
 modelsummary::modelsummary(multi_regression,
@@ -118,11 +129,20 @@ modelsummary::modelsummary(multi_regression,
                                          "p = {p.value}"),
                            gof_map = c("nobs", "r.squared", "adj.r.squared"))
 ```
-
+This multiple regression is an attempt to control for a few of those variables above, and it results in a decrease in the estimated coefficient. It has been shown that both sex and education status affect voter likelihood (women are more likely to vote, and people who have received a higher education are more likely to vote, respectively). Relating more closely to this study, it might be possible that feelings of LGBT identity in a local community might differ from perceptions of national acceptance of LGBT identities, and this might also correlate with voter likelihood. The above regression shows that when the respondent’s sex (female or not female), education status (higher education or not), and feelings of local acceptance of LGBT identities are held constant, voting likelihood increases by 0.180 units for every 1-unit increase in feelings of national LGBT acceptance. This is a smaller change than 0.274 units from the previous one variable linear regression coefficient, suggesting that other factors have an impact on voting likelihood. The p-value of this coefficient, about 0 (less than 0.05), also indicates that this coefficient is statistically significant.
 
 # Conclusion
 
+Overall, greater feelings of national acceptance of LGBT identities are positively associated with greater voter likelihood amongst LGBT American adults. The findings thus support my hypothesis.
+
+Some limitations of the study include the sample size. A greater sample size can make it easier to find more representative results of a population. A second limitation is that the data did not include other factors beyond demographics that include race, such as the extent of voter suppression in the respondent’s residence, which can impact voting likelihood. Third, because the survey aimed to protect individuals’s identities, it only collected self-reported voter likelihood and not actual voter records over time. Since self-reported voting statistics are often influenced by desirability bias (e.g. people want to appear that they vote more often than they actually do), this could lead to inaccurate data. 
+
+One improvement for this study would be to find a dataset with a greater sample size and that controlled for more factors that have been shown to impact voter likelihood. Another way to improve this analysis would be to account for the remaining surveyed demographic factors (race, age, etc.) and control those factors in the linear regression. A second way to improve this analysis would have been to observe the average treatment effect of living in an area of high LGBT acceptance on voting likelihood amongst survey respondents to see if there is a potential causal relationship.
+
 # Bibliography
+
+Thank you to TFs Dorothy and Sooahn for their help!
+
 "About Pew Research Center." Pew Research Center, www.pewresearch.org/about/.
 
 Cherry, Kendra. "How Do Cross-Sectional Studies Work?" Very Well Mind, www.verywellmind.com/what-is-a-cross-sectional-study-2794978.
